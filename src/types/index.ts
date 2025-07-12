@@ -5,7 +5,7 @@ export interface Product {
   type: 'material' | 'subscription' | 'service';
   description: string;
   originalPrice: number;
-  modifiedPrice?: number;
+  modifiedPrice?:number;
   modifiedDescription?: string;
   quantity: number;
   unit?: string;

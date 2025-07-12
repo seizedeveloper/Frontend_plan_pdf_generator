@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 import { Product } from '../types'
+import html2pdf from 'html2pdf.js'
 import autoTable from 'jspdf-autotable'
+import OfferPdfTemplate from './offerPdfTemplate'
 
 interface OfferReviewProps {
   products: Product[]
@@ -19,6 +21,7 @@ const OfferReview = ({
   products: initialProducts,
   details,
 }: OfferReviewProps) => {
+const pdfRef = useRef(null)
   const [products, setProducts] = useState<Product[]>(initialProducts)
   const [pdfStatus, setPdfStatus] = useState<'idle' | 'success' | 'error'>(
     'idle'
@@ -66,84 +69,28 @@ const OfferReview = ({
     )
   }
 
-  const generatePDF = () => {
-    const doc = new jsPDF()
+  const generatePDF = async() => {
+try {
+    if (!pdfRef.current) return
 
-    // === Letterhead ===
-    doc.setFontSize(20)
-    doc.setFont('helvetica', 'bold')
-    doc.text('Your Company Name Here', 14, 20)
+    const element = pdfRef.current
 
-    doc.setFontSize(10)
-    doc.setFont('helvetica', 'normal')
-    doc.text('Professional Service Solutions', 14, 27)
-    doc.line(14, 30, 196, 30) // Horizontal line
-
-    // === Client Details & Offer Info ===
-    doc.setFontSize(12)
-    let y = 38
-    doc.text(`Offer Name: ${details.offerName || 'Custom Offer'}`, 14, y)
-    y += 6
-    doc.text(`Client: ${details.clientName || 'N/A'}`, 14, y)
-    y += 6
-    if (details.clientEmail) {
-      doc.text(`Email: ${details.clientEmail}`, 14, y)
-      y += 6
-    }
-    if (details.expirationDate) {
-      doc.text(
-        `Valid Until: ${new Date(details.expirationDate).toLocaleDateString()}`,
-        14,
-        y
-      )
-      y += 6
+    const opt = {
+      margin:       0.5,
+      filename:     `${details.offerName || 'Offer'}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
     }
 
-    // === Notes ===
-    if (details.notes) {
-      doc.setFont('helvetica', 'bold')
-      doc.text('Additional Notes:', 14, y + 4)
-      doc.setFont('helvetica', 'normal')
-      const splitNotes = doc.splitTextToSize(details.notes, 180)
-      doc.text(splitNotes, 14, y + 10)
-      y += splitNotes.length * 6 + 10
-    }
-
-    // === Product Table ===
-    autoTable(doc, {
-      startY: y + 10,
-      head: [['Product', 'Description', 'Quantity', 'Price', 'Total']],
-      body: products.map((p) => [
-        p.name,
-        p.modifiedDescription || p.description,
-        `${p.quantity} ${p.unit || ''}`,
-        `$${(p.modifiedPrice || p.originalPrice).toFixed(2)}`,
-        `$${((p.modifiedPrice || p.originalPrice) * p.quantity).toFixed(2)}`,
-      ]),
-      styles: { fontSize: 10 },
-      headStyles: { fillColor: [41, 128, 185] },
-    })
-
-    // === Total Section ===
-    const total = calculateTotal()
-    const finalY = doc.lastAutoTable.finalY || y + 30
-    doc.setFontSize(12)
-    doc.setFont('helvetica', 'bold')
-    doc.text(`Grand Total: $${total.toFixed(2)}`, 150, finalY + 10)
-
-    // === Footer ===
-    doc.setFontSize(9)
-    doc.setFont('helvetica', 'italic')
-    doc.text(
-      'Your Company Name • contact@yourcompany.com • +1 (000) 123-4567',
-      14,
-      285
-    )
-    doc.text('Thank you for your business!', 14, 290)
-
-    // === Save PDF ===
-    doc.save(`${details.offerName || 'Offer'}.pdf`)
+    await html2pdf().set(opt).from(element).save()
+    setPdfStatus('success')
+  } catch (err) {
+    console.error('PDF generation failed:', err)
+    setPdfStatus('error')
   }
+}
+
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -290,8 +237,15 @@ const OfferReview = ({
           </p>
         )}
       </div>
+      <div style={{ display: 'none' }}>
+  <OfferPdfTemplate ref={pdfRef} products={products} details={details} />
+</div>
     </div>
+    
+    
   )
 }
 
 export default OfferReview
+
+

@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import ProductSelection from './ProductSelection'
 import OfferDetails from './OfferDetails'
@@ -13,6 +14,7 @@ const steps = [
 ]
 
 const OfferFlow = () => {
+const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(1)
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([])
   const [offerDetails, setOfferDetails] = useState({
@@ -22,6 +24,20 @@ const OfferFlow = () => {
     expirationDate: null,
     notes: '',
   })
+  
+  useEffect(() => {
+    const user = localStorage.getItem('user')
+    if (!user) {
+      navigate('/login')
+    } else {
+      const userObj = JSON.parse(user)
+      setOfferDetails((prev) => ({
+        ...prev,
+        clientName: userObj.name || prev.clientName,
+        clientEmail: userObj.email || prev.clientEmail,
+      }))
+    }
+  }, [])
 
   const nextStep = () => {
     if (currentStep < steps.length) {
@@ -43,6 +59,11 @@ const OfferFlow = () => {
 
   const handleDetailsChange = (details: any) => {
     setOfferDetails({ ...offerDetails, ...details })
+  }
+  
+    const handleLogout = () => {
+    localStorage.removeItem('user')
+    navigate('/login')
   }
 
   return (
