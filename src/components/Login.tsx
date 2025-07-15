@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from "react-router-dom";
+import { Base_url } from '@/api';
+
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +26,7 @@ const Login = () => {
     
     try {
       // Simulate API call
-     const response = await fetch('http://localhost:8000/api/auth/login/', {
+     const response = await fetch(`${Base_url}/auth/login/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
