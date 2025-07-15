@@ -26,7 +26,7 @@ const Login = () => {
     
     try {
       // Simulate API call
-     const response = await fetch(`${Base_url}/auth/login/`, {
+     const response = await fetch(`${Base_url}auth/login/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

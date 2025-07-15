@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { Product } from '../types'
 import ProductCard from './ProductCard'
 import { Search, List, LayoutGrid } from 'lucide-react'
+import { Base_url } from '@/api'
 
 interface ProductSelectionProps {
   selectedProducts: Product[]
@@ -26,7 +27,7 @@ const ProductSelection = ({
   useEffect(() => {
     const fetchSheets = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/excel-data/')
+        const response = await fetch(`${Base_url}excel-data/`)
         const result = await response.json()
         setSheetNames(Object.keys(result.data || {}))
       } catch (error) {

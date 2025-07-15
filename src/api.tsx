@@ -1,1 +1,1 @@
-export const Base_url = 'https://qotely-a7be3f582ed5.herokuapp.com/';
+export const Base_url = 'https://qotely-a7be3f582ed5.herokuapp.com/api/';
