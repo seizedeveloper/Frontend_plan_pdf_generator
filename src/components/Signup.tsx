@@ -51,7 +51,7 @@ const Signup = () => {
 
     try {
       // Simulate API call
-      const response = await fetch(`${Base_url}auth/signup`, {
+      const response = await fetch(`${Base_url}auth/signup/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
