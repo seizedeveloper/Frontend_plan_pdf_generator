@@ -46,7 +46,7 @@ const ProductSelection = ({
 
     const fetchSheetData = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/excel-data/')
+        const response = await fetch(`${Base_url}excel-data/`)
         const result = await response.json()
 
         const sheetItems = result.data[selectedSheet]
