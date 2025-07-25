@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
-import jsPDF from 'jspdf'
+// import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 import { Product } from '../types'
-import html2pdf from 'html2pdf.js'
+// import html2pdf from 'html2pdf.js'
 import autoTable from 'jspdf-autotable'
-import OfferPdfTemplate from './offerPdfTemplate'
+import { generateOfferPdf } from './GenerateOfferPDF'
+
 
 interface OfferReviewProps {
   products: Product[]
@@ -21,7 +22,9 @@ const OfferReview = ({
   products: initialProducts,
   details,
 }: OfferReviewProps) => {
-const pdfRef = useRef(null)
+  const pdfRef = useRef(null)
+  const [discount, setDiscount] = useState(0)
+  const [tax, setTax] = useState(0)
   const [products, setProducts] = useState<Product[]>(initialProducts)
   const [pdfStatus, setPdfStatus] = useState<'idle' | 'success' | 'error'>(
     'idle'
@@ -60,7 +63,7 @@ const pdfRef = useRef(null)
     )
   }
 
-  const calculateTotal = () => {
+  const calculateSubtotal = () => {
     return products.reduce(
       (total, product) =>
         total +
@@ -69,27 +72,26 @@ const pdfRef = useRef(null)
     )
   }
 
-  const generatePDF = async() => {
-try {
-    if (!pdfRef.current) return
-
-    const element = pdfRef.current
-
-    const opt = {
-      margin:       0.5,
-      filename:     `${details.offerName || 'Offer'}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2 },
-      jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-    }
-
-    await html2pdf().set(opt).from(element).save()
-    setPdfStatus('success')
-  } catch (err) {
-    console.error('PDF generation failed:', err)
-    setPdfStatus('error')
+  const calculateTotal = () => {
+    const subtotal = calculateSubtotal();
+    const discounted = subtotal - (subtotal * discount) / 100
+    const taxed = discounted + (discounted * tax) / 100
+    return taxed
   }
-}
+
+  const generatePDF = () => {
+  try {
+    generateOfferPdf(products, {
+      ...details,
+      discount,
+      tax
+    });
+    setPdfStatus('success');
+  } catch (err) {
+    console.error('PDF generation failed:', err);
+    setPdfStatus('error');
+  }
+};
 
 
   return (
@@ -185,11 +187,60 @@ try {
               </tbody>
               <tfoot className="border-t-2 border-gray-300">
                 <tr>
+                
                   <td
                     colSpan={4}
                     className="px-4 py-3 text-right font-semibold"
                   >
                     Total
+                  </td>
+                  <td className="px-4 py-3 text-right font-bold text-brand-700">
+                    ${calculateSubtotal().toFixed(2)}
+                  </td>
+                </tr>
+
+                <tr>
+                  <td colSpan={4} className="px-4 py-2 text-right text-sm font-medium">
+                    Discount (%)
+                  </td>
+                  <td className="px-4 py-2 text-right">
+                    <input
+                      type="text" 
+                      inputMode="numeric" 
+                      className="w-20 border p-1 text-right"
+                      value={discount.toString()}
+                      onChange={(e) => {
+                        let val = e.target.value
+                        val = val.replace(/[^\d]/g, '')
+                        val = val.replace(/^0+(?!$)/, '')
+
+                        setDiscount(val === '' ? 0 : parseInt(val))
+                      }}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan={4} className="px-4 py-2 text-right text-sm font-medium">
+                    Tax (%)
+                  </td>
+                  <td className="px-4 py-2 text-right">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      className="w-20 border p-1 text-right"
+                      value={tax.toString()}
+                      onChange={(e) => {
+                        let val = e.target.value
+                        val = val.replace(/[^\d]/g, '')
+                        val = val.replace(/^0+(?!$)/, '')
+                        setTax(val === '' ? 0 : parseInt(val))
+                      }}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan={4} className="px-4 py-3 text-right font-semibold">
+                    Final Total
                   </td>
                   <td className="px-4 py-3 text-right font-bold text-brand-700">
                     ${calculateTotal().toFixed(2)}
@@ -227,9 +278,8 @@ try {
 
         {showStatus && (
           <p
-            className={`text-sm mt-2 ${
-              pdfStatus === 'success' ? 'text-green-600' : 'text-red-600'
-            }`}
+            className={`text-sm mt-2 ${pdfStatus === 'success' ? 'text-green-600' : 'text-red-600'
+              }`}
           >
             {pdfStatus === 'success'
               ? 'PDF downloaded successfully!'
@@ -237,12 +287,12 @@ try {
           </p>
         )}
       </div>
-      <div style={{ display: 'none' }}>
-  <OfferPdfTemplate ref={pdfRef} products={products} details={details} />
-</div>
+      {/* <div style={{ display: 'none' }}>
+        <OfferPdfTemplate ref={pdfRef} products={products} details={details} />
+      </div> */}
     </div>
-    
-    
+
+
   )
 }
 
