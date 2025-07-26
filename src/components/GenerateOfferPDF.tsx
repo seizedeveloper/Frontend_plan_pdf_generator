@@ -72,9 +72,9 @@ export function generateOfferPdf(
   const tableData = products.map((p) => [
     p.name,
     p.modifiedDescription || p.description,
-    `$${(p.modifiedPrice || p.originalPrice).toFixed(2)}`,
+    `€${(p.modifiedPrice || p.originalPrice).toFixed(2)}`,
     `${p.quantity} ${p.unit || ''}`,
-    `$${((p.modifiedPrice || p.originalPrice) * p.quantity).toFixed(2)}`
+    `€${((p.modifiedPrice || p.originalPrice) * p.quantity).toFixed(2)}`
   ]);
 
   autoTable(doc, {
@@ -103,10 +103,10 @@ export function generateOfferPdf(
   const taxed = discounted + (discounted * details.tax) / 100;
 
   const totals = [
-    ['Subtotal:', `$${subtotal.toFixed(2)}`],
-    [`Discount (${details.discount}%):`, `-$${(subtotal * details.discount / 100).toFixed(2)}`],
-    [`Tax (${details.tax}%):`, `$${((discounted * details.tax) / 100).toFixed(2)}`],
-    ['Total:', `$${taxed.toFixed(2)}`],
+    ['Subtotal:', `€${subtotal.toFixed(2)}`],
+    [`Discount (${details.discount}%):`, `-€${(subtotal * details.discount / 100).toFixed(2)}`],
+    [`Tax (${details.tax}%):`, `€${((discounted * details.tax) / 100).toFixed(2)}`],
+    ['Total:', `€${taxed.toFixed(2)}`],
   ];
 
   totals.forEach(([label, value], i) => {

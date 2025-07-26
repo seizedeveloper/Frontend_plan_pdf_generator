@@ -127,7 +127,7 @@ const ProductCard = ({
                 <label className="text-xs text-gray-500 w-16">Price</label>
                 <div className="relative">
                   <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500">
-                    $
+                    €
                   </span>
                   <input
                     type="number"
@@ -163,7 +163,7 @@ const ProductCard = ({
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold text-brand-700">
-                    $
+                    €
                     {(product.modifiedPrice || product.originalPrice).toFixed(
                       2
                     )}
@@ -175,7 +175,7 @@ const ProductCard = ({
                   </p>
                   {product.modifiedPrice && (
                     <p className="text-xs text-gray-500 line-through">
-                      ${product.originalPrice.toFixed(2)}
+                      €{product.originalPrice.toFixed(2)}
                     </p>
                   )}
                 </div>

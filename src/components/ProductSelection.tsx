@@ -231,7 +231,7 @@ const ProductSelection = ({
               {selectedProducts.length !== 1 ? 's' : ''} selected
             </span>
             <p className="text-sm text-brand-600">
-              Total value: $
+              Total value: €
               {selectedProducts
                 .reduce(
                   (sum, product) =>

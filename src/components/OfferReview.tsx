@@ -176,7 +176,7 @@ const OfferReview = ({
                       />
                     </td>
                     <td className="px-4 py-3 text-right font-medium">
-                      $
+                      €
                       {(
                         (product.modifiedPrice || product.originalPrice) *
                         product.quantity
@@ -195,7 +195,7 @@ const OfferReview = ({
                     Total
                   </td>
                   <td className="px-4 py-3 text-right font-bold text-brand-700">
-                    ${calculateSubtotal().toFixed(2)}
+                    €{calculateSubtotal().toFixed(2)}
                   </td>
                 </tr>
 
@@ -243,7 +243,7 @@ const OfferReview = ({
                     Final Total
                   </td>
                   <td className="px-4 py-3 text-right font-bold text-brand-700">
-                    ${calculateTotal().toFixed(2)}
+                    €{calculateTotal().toFixed(2)}
                   </td>
                 </tr>
               </tfoot>
