@@ -1,2 +1,2 @@
-web: serve -s dist
+web:npm run start
 
